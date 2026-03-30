@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leadership Dashboard</title>
+<style>
+:root{
+  --bg:#f5f5f3;--surface:#fff;--surface2:#f0efed;--surface3:#e8e7e4;
+  --border:#e2e1de;--border2:#cccac5;
+  --text:#1a1a18;--text2:#5a5955;--text3:#8a8884;
+  --accent:#1a56db;--accent-bg:#eff4ff;
+  --success:#057a55;--success-bg:#e3faf0;
+  --warn:#b45309;--warn-bg:#fffbeb;
+  --danger:#c81e1e;--danger-bg:#fef2f2;
+  --purple:#6c2bd9;--purple-bg:#f5f3ff;
+  --r:8px;--rl:12px;
+}
+[data-theme="dark"]{
+  --bg:#0f0f0e;--surface:#1a1a18;--surface2:#242422;--surface3:#2e2e2b;
+  --border:#333330;--border2:#444440;
+  --text:#f0efe8;--text2:#a8a7a0;--text3:#6a6a64;
+  --accent:#4a8af4;--accent-bg:#1a2540;
+  --success:#22c55e;--success-bg:#0d2818;
+  --warn:#f59e0b;--warn-bg:#2a1f0a;
+  --danger:#f87171;--danger-bg:#2a0f0f;
+  --purple:#a78bfa;--purple-bg:#1e1530;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;transition:background .2s,color .2s;}
+
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 22px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:200;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.logo-area{display:flex;align-items:center;gap:7px;}
+.logo-placeholder{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),#4f46e5);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.logo-placeholder svg{width:17px;height:17px;fill:white;}
+.logo-img{height:32px;width:auto;max-width:85px;object-fit:contain;border-radius:4px;}
+.client-logo-img{height:26px;width:auto;max-width:72px;object-fit:contain;opacity:.85;}
+.divider-v{width:1px;height:26px;background:var(--border2);margin:0 2px;}
+.tb-title{font-size:14px;font-weight:700;}
+.tb-sub{font-size:10px;color:var(--text3);}
+.tb-right{display:flex;align-items:center;gap:6px;}
+.call-badge{background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap;}
+.live-row{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);}
+.live-dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.btn{padding:5px 10px;border-radius:var(--r);font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text2);display:flex;align-items:center;gap:4px;transition:all .15s;}
+.btn:hover{background:var(--surface2);}
+.btn-icon{padding:4px 7px;font-size:13px;}
+
+.page{max-width:1180px;margin:0 auto;padding:22px;}
+
+/* SESSION BAR */
+.session-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;}
+.sb-left{display:flex;flex-direction:column;gap:2px;}
+.sb-title{font-size:12px;font-weight:700;color:var(--text);}
+.sb-sub{font-size:10px;color:var(--text3);}
+.sb-pills{display:flex;gap:5px;}
+.role-pill{font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;margin-bottom:18px;}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:13px 15px;}
+.mc.hi{border-left:3px solid var(--accent);}
+.mc-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:5px;}
+.mc-val{font-size:26px;font-weight:800;line-height:1;}
+.mc-sub{font-size:9px;color:var(--text3);margin-top:3px;}
+
+/* CHARTS */
+.charts-area{margin-bottom:18px;}
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.chart-title{font-size:12px;font-weight:700;}
+.chart-toggle{font-size:11px;color:var(--accent);cursor:pointer;background:none;border:none;font-family:inherit;}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:14px;}
+.chart-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:10px;}
+.bar-chart{display:flex;flex-direction:column;gap:5px;}
+.bar-row{display:flex;align-items:center;gap:7px;}
+.bar-label{font-size:10px;color:var(--text2);width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:99px;}
+.bar-val{font-size:10px;font-weight:600;color:var(--text3);width:16px;text-align:right;}
+.donut-wrap{display:flex;align-items:center;gap:12px;}
+.donut-legend{display:flex;flex-direction:column;gap:4px;}
+.dl-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);}
+.dl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.eta-bars{display:flex;flex-direction:column;gap:5px;}
+
+/* STATUS BAR */
+.status-ov{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px;margin-bottom:18px;}
+.ov-title{font-size:12px;font-weight:700;margin-bottom:2px;}
+.ov-sub{font-size:10px;color:var(--text3);margin-bottom:10px;}
+.bar-wrap{display:flex;gap:2px;height:9px;border-radius:99px;overflow:hidden;}
+.bar-seg{height:100%;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);}
+.leg-dot{width:8px;height:8px;border-radius:50%;}
+
+.sec{margin-bottom:18px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-title{font-size:12px;font-weight:700;}
+.sec-sub{font-size:10px;color:var(--text3);}
+
+.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;}
+.tc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;}
+.tc-hdr{padding:10px 13px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.tc-name{font-size:11px;font-weight:700;}
+.tc-cnt{font-size:9px;font-weight:700;background:var(--accent-bg);color:var(--accent);padding:2px 7px;border-radius:99px;}
+.tc-body{padding:9px 13px;}
+.mini-badges{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:7px;}
+.mb{font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;}
+.cmi{display:flex;align-items:flex-start;gap:5px;padding:5px 7px;background:var(--surface2);border-radius:5px;cursor:pointer;transition:background .1s;margin-bottom:3px;}
+.cmi:hover{background:var(--surface3);}
+.cmi-id{font-size:9px;font-weight:700;color:var(--accent);font-family:monospace;white-space:nowrap;margin-top:1px;}
+.cmi-desc{font-size:10px;color:var(--text2);flex:1;line-height:1.3;}
+.cmi-s{font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;white-space:nowrap;}
+
+.alert-list{display:flex;flex-direction:column;gap:6px;}
+.al-item{background:var(--surface);border:1px solid;border-radius:var(--r);padding:9px 13px;display:flex;align-items:center;gap:9px;cursor:pointer;}
+.al-id{font-size:9px;font-weight:700;font-family:monospace;white-space:nowrap;}
+.al-desc{flex:1;font-size:11px;color:var(--text);}
+.al-tower{font-size:10px;color:var(--text3);white-space:nowrap;}
+.al-tag{font-size:10px;font-weight:700;white-space:nowrap;}
+
+/* DETAIL MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.dmodal{background:var(--surface);border-radius:var(--rl);width:100%;max-width:580px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,.2);}
+.dmh{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:9px;flex-shrink:0;}
+.dmh-info{flex:1;}
+.dm-cid{font-size:10px;font-weight:700;color:var(--accent);font-family:monospace;margin-bottom:3px;}
+.dm-title{font-size:14px;font-weight:700;}
+.dm-meta{font-size:10px;color:var(--text3);margin-top:3px;}
+.mclose{background:var(--surface2);border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;color:var(--text2);}
+.dmb{padding:16px 20px;overflow-y:auto;flex:1;}
+.dm-fields{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px;}
+.dmfl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:2px;}
+.dmfv{font-size:12px;color:var(--text);}
+.dmfv.muted{color:var(--text3);font-style:italic;}
+.hist-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:8px;}
+.hlist{display:flex;flex-direction:column;gap:5px;}
+.hentry{background:var(--surface2);border-radius:var(--r);padding:7px 9px;border-left:3px solid var(--border2);}
+.hentry.latest{border-left-color:var(--accent);}
+.hts{font-size:9px;font-weight:600;color:var(--text3);margin-bottom:2px;}
+.htxt{font-size:11px;color:var(--text);line-height:1.5;}
+.hempty{text-align:center;padding:14px;color:var(--text3);font-size:11px;background:var(--surface2);border-radius:var(--r);font-style:italic;}
+
+/* SETTINGS DRAWER */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;display:none;}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:380px;background:var(--surface);border-left:1px solid var(--border);z-index:401;display:flex;flex-direction:column;overflow:hidden;transform:translateX(100%);transition:transform .25s;}
+.drawer.open{transform:translateX(0);}
+.drw-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.drw-title{font-size:13px;font-weight:700;}
+.drw-body{flex:1;overflow-y:auto;padding:16px;}
+.drw-sec{margin-bottom:18px;}
+.drw-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:7px;}
+.drw-row{display:flex;gap:6px;margin-bottom:5px;}
+.drw-in{flex:1;padding:6px 8px;border:1px solid var(--border2);border-radius:var(--r);font-size:12px;color:var(--text);background:var(--surface);outline:none;}
+.drw-in:focus{border-color:var(--accent);}
+.drw-btn{padding:6px 10px;background:var(--accent);color:white;border:none;border-radius:var(--r);font-size:11px;cursor:pointer;font-weight:500;}
+.admin-gate{background:var(--surface2);border-radius:var(--r);padding:14px;}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r);padding:12px;text-align:center;cursor:pointer;}
+.upload-zone:hover{border-color:var(--accent);}
+.upload-zone input{display:none;}
+.upload-prev{max-height:30px;width:auto;max-width:80px;object-fit:contain;margin:4px auto;display:block;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;}
+.tgl{width:36px;height:20px;background:var(--border2);border-radius:99px;position:relative;cursor:pointer;border:none;transition:background .2s;}
+.tgl.on{background:var(--accent);}
+.tgl::after{content:'';width:14px;height:14px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .2s;}
+.tgl.on::after{left:19px;}
+.color-row{display:flex;align-items:center;gap:8px;}
+.color-swatch{width:26px;height:26px;border-radius:var(--r);border:1px solid var(--border);cursor:pointer;padding:0;}
+.excel-btns{display:flex;gap:6px;}
+.excel-btn{flex:1;padding:7px;border-radius:var(--r);font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center;gap:4px;}
+.excel-btn:hover{background:var(--surface2);}
+.excel-btn.primary{background:var(--accent);color:white;border-color:var(--accent);}
+.secure-notice{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:9px;font-size:10px;color:var(--text3);line-height:1.5;}
+
+.toast{position:fixed;bottom:18px;right:18px;background:#1a1a18;color:white;padding:7px 13px;border-radius:var(--r);font-size:11px;font-weight:500;z-index:9999;transform:translateY(50px);opacity:0;transition:all .2s;}
+.toast.show{transform:translateY(0);opacity:1;}
+[data-theme="dark"] .toast{background:#f0efe8;color:#1a1a18;}
+@media print{.topbar,.drawer,.drawer-overlay,.overlay,.btn{display:none!important;}.page{padding:0;}}
+.sb-credit{position:fixed;bottom:14px;right:18px;font-size:10px;color:var(--text3);opacity:.55;pointer-events:none;z-index:50;letter-spacing:.02em;}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="detailOverlay">
+  <div class="dmodal">
+    <div class="dmh"><div class="dmh-info"><div class="dm-cid" id="dCid"></div><div class="dm-title" id="dTitle"></div><div class="dm-meta" id="dMeta"></div></div><button class="mclose" onclick="closeDetail()">&#10005;</button></div>
+    <div class="dmb"><div class="dm-fields" id="dFields"></div><div class="hist-lbl">Full action history</div><div id="dHistory"></div></div>
+  </div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeSettings()"></div>
+<div class="drawer" id="settingsDrawer">
+  <div class="drw-hdr"><span class="drw-title">Settings</span><button class="mclose" onclick="closeSettings()">&#10005;</button></div>
+  <div class="drw-body" id="settingsBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="sb-credit">Created by Smallbox</div>
+<div class="topbar">
+  <div class="tb-left">
+    <div class="logo-area">
+      <div class="logo-placeholder" id="companyLogoPlaceholder"><svg viewBox="0 0 24 24"><path d="M2 3h6v6H2zm7 0h6v6H9zm7 0h6v6h-6zM2 10h6v6H2zm7 0h6v6H9zm7 0h6v6h-6zM2 17h6v6H2zm7 0h6v6H9zm7 0h6v6h-6z"/></svg></div>
+      <img id="companyLogoImg" class="logo-img" style="display:none;"/>
+      <div class="divider-v" id="clientLogoDivider" style="display:none;"></div>
+      <img id="clientLogoImg" class="client-logo-img" style="display:none;"/>
+    </div>
+    <div><div class="tb-title">Leadership Dashboard</div><div class="tb-sub" id="tbSub"></div></div>
+  </div>
+  <div class="tb-right">
+    <div class="live-row"><div class="live-dot"></div>Live</div>
+    <span class="call-badge" id="callBadge">5:30 PM Review</span>
+    <button class="btn btn-icon" id="themeBtn" onclick="toggleTheme()">&#127769;</button>
+    <button class="btn btn-icon" onclick="openSettings()">&#9881;</button>
+    <button class="btn" onclick="window.print()">&#128438; Print</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="session-bar">
+    <div class="sb-left"><div class="sb-title" id="sessionTitle">Operations Review</div><div class="sb-sub" id="sessionSub"></div></div>
+    <div class="sb-pills" id="sessionPills"></div>
+  </div>
+  <div class="metrics" id="metricsRow"></div>
+  <div class="charts-area" id="chartsArea">
+    <div class="chart-hdr"><span class="chart-title">Overview charts</span><button class="chart-toggle" id="chartToggleBtn" onclick="toggleCharts()">Hide charts</button></div>
+    <div class="charts-grid" id="chartsGrid"></div>
+  </div>
+  <div class="status-ov"><div class="ov-title">Overall status distribution</div><div class="ov-sub">All clusters across all towers</div><div class="bar-wrap" id="statusBar"></div><div class="legend" id="statusLegend"></div></div>
+  <div class="sec" id="blockersSec"><div class="sec-hdr"><div><div class="sec-title" style="color:var(--danger);">Active blockers — no updates logged</div><div class="sec-sub">Requires immediate attention</div></div></div><div class="alert-list" id="blockersList"></div></div>
+  <div class="sec"><div class="sec-hdr"><div class="sec-title">Cluster breakdown by tower</div><div class="sec-sub" id="towerSub"></div></div><div class="tgrid" id="towerGrid"></div></div>
+  <div class="sec" id="overdueSec"><div class="sec-hdr"><div><div class="sec-title" style="color:var(--warn);">ETA overdue</div><div class="sec-sub">Original ETA has passed</div></div></div><div class="alert-list" id="overdueList"></div></div>
+</div>
+
+<script>
+const S={get:k=>{try{return JSON.parse(localStorage.getItem('pa_'+k));}catch(e){return null;}},set:(k,v)=>localStorage.setItem('pa_'+k,JSON.stringify(v))};
+const DEFAULT_CLUSTERS=[{id:'CL-001',sn:[1,2,3,4],desc:'VMware / vROps CPU & Capacity Alerts',tower:'VMware+Wintel',status:'In Progress',ci:'CASESX142',eta:'2026-03-13',extEta:'2026-04-05',inc:'INC0041872',nextAction:'Joint call with EC team to review recommended solution',history:[{ts:'4 Mar 2026 · 10:00',text:'Vendor proposed three options: delay-enable process, threshold adjustment, or alert suppression.'},{ts:'12 Mar 2026 · 11:00',text:'Client suggested delay notification: CPU at 80% for >5 min triggers alert.'},{ts:'26 Mar 2026 · 09:00',text:'Call rescheduled for 30 Mar 2026 at 2:30 PM IST. Awaiting outcome.'}]},{id:'CL-002',sn:[12,13],desc:'Backup Media Agent Offline',tower:'Backup+Linux',status:'In Progress',ci:'BKPAGENT-07',eta:'2026-04-02',extEta:'',inc:'INC0039541',nextAction:'Apply permanent fix via media agent upgrade v11.2 by 2 Apr',history:[{ts:'10 Mar 2026 · 08:00',text:'Agent offline. Manual restart performed.'},{ts:'28 Mar 2026 · 14:00',text:'Upgrade approved. Scheduled maintenance window on 2 Apr 2026.'}]},{id:'CL-003',sn:[14],desc:'License Consumption Warning',tower:'Backup',status:'Resolved',ci:'BKPLICMGR',eta:'2026-03-10',extEta:'',inc:'INC0037210',nextAction:'Closed',history:[{ts:'10 Mar 2026 · 09:00',text:'14 decommissioned VMs removed. License at 74%. Closed.'}]},{id:'CL-004',sn:[15],desc:'Auxiliary Copy Delay (8 hours)',tower:'Backup+Network',status:'In Progress',ci:'AUXCOPY-DC1',eta:'2026-04-10',extEta:'',inc:'INC0040123',nextAction:'Investigate bandwidth throttling on DC1-DC2 link',history:[{ts:'28 Mar 2026 · 10:30',text:'Network confirmed throttling at 200 Mbps. Reviewing increase to 500 Mbps.'}]},{id:'CL-005',sn:[16],desc:'Notify Decommissioned VM',tower:'Backup',status:'Resolved',ci:'DCVM-LIST',eta:'2026-03-15',extEta:'',inc:'INC0037890',nextAction:'Closed',history:[{ts:'15 Mar 2026 · 09:00',text:'8 VMs removed. 1.2 TB recovered. Checklist updated.'}]},{id:'CL-006',sn:[18],desc:'Linux High Load Average',tower:'Linux',status:'Pending RCA',ci:'LINPROD-04',eta:'2026-04-07',extEta:'',inc:'INC0041005',nextAction:'Complete RCA report by 7 Apr',history:[{ts:'27 Mar 2026 · 14:30',text:'Kernel scheduling issue suspected. RCA ongoing.'}]},{id:'CL-007',sn:[24],desc:'Repeated CPU Alerts (Non-Prod VM)',tower:'Cloud',status:'Resolved',ci:'NPVM-CLOUD-12',eta:'2026-03-20',extEta:'',inc:'INC0038540',nextAction:'Closed',history:[{ts:'20 Mar 2026 · 10:00',text:'Dev team load tests identified. Threshold adjusted to 95% for non-prod.'}]},{id:'CL-008',sn:[25,26],desc:'Windows C Drive Disk Space Low',tower:'Windows+App',status:'Pending RCA',ci:'WINAPP-SRV-03',eta:'2026-04-05',extEta:'',inc:'INC0040678',nextAction:'Identify application generating large temp files',history:[{ts:'29 Mar 2026 · 15:00',text:'Drive back to 88% in 4 days. Suspected large log dumps in temp folder.'}]},{id:'CL-009',sn:[30],desc:'High CPU Utilization (DB18)',tower:'Cloud',status:'In Progress',ci:'DB18-CLOUD',eta:'2026-04-08',extEta:'',inc:'INC0041230',nextAction:'VM resize D4s_v3 to D8s_v3 — awaiting client approval',history:[{ts:'29 Mar 2026 · 10:00',text:'VM resize recommended. Cost +$320/month. Awaiting client approval.'}]},{id:'CL-010',sn:[31],desc:'Repeated CPU Alerts (DB02)',tower:'Cloud+App',status:'Pending RCA',ci:'DB02-CLOUD',eta:'2026-04-10',extEta:'',inc:'INC0041310',nextAction:'Review DB02 query execution plans',history:[{ts:'30 Mar 2026 · 09:00',text:'RCA open — root cause may be unoptimised queries.'}]},{id:'CL-011',sn:[32],desc:'High Memory & Splunk CPU Spikes',tower:'Cloud+App',status:'Pending RCA',ci:'SPLUNK-IDX-02',eta:'2026-04-12',extEta:'',inc:'INC0041450',nextAction:'Review Splunk indexer config and ingestion limits',history:[{ts:'30 Mar 2026 · 09:30',text:'CPU spikes still occurring. Deeper config review underway.'}]},{id:'CL-012',sn:[33],desc:'High CPU - Unsupported Azure VM SKU',tower:'Cloud',status:'Pending',ci:'AZVM-SKU-OLD',eta:'2026-04-15',extEta:'',inc:'INC0041560',nextAction:'Raise change request for VM SKU migration',history:[{ts:'29 Mar 2026 · 10:00',text:'Change request being drafted. Estimated downtime: 15 minutes.'}]},{id:'CL-013',sn:[34],desc:'Windows C Drive >95% (ISO files)',tower:'Cloud+Citrix',status:'Pending RCA',ci:'CITRIX-SRV-01',eta:'2026-04-06',extEta:'',inc:'INC0041620',nextAction:'Implement auto-cleanup script for ISO staging folder',history:[{ts:'29 Mar 2026 · 14:00',text:'48 GB ISO files found. 38 GB cleaned.'}]},{id:'CL-014',sn:[35,36,37],desc:'Recurring Backup Job / L1-L2 Routing Issues',tower:'Backup',status:'In Progress',ci:'BKPROUTE-ALL',eta:'2026-04-14',extEta:'',inc:'INC0041700',nextAction:'L1 training session on 5 Apr on updated routing runbook',history:[{ts:'29 Mar 2026 · 11:00',text:'New runbook done. Training on 5 Apr.'}]},{id:'CL-015',sn:[38],desc:'Disk Space Low (User Profile Data)',tower:'Windows',status:'Resolved',ci:'USERPROFILE-FS',eta:'2026-03-25',extEta:'',inc:'INC0040890',nextAction:'Closed',history:[{ts:'25 Mar 2026 · 10:00',text:'120 GB orphaned profiles removed. Resolved.'}]},{id:'CL-016',sn:[40],desc:'DB Buffer Cache Hit Issue',tower:'Cloud+Oracle',status:'Pending',ci:'ORA-PROD-DB',eta:'2026-04-18',extEta:'',inc:'INC0041800',nextAction:'Oracle DBA to submit SGA tuning recommendations',history:[{ts:'30 Mar 2026 · 09:00',text:'SGA undersized. Oracle DBA engaged.'}]},{id:'CL-017',sn:[41],desc:'VCE Device Certificate Issue',tower:'Network',status:'In Progress',ci:'VCE-CORE-SW',eta:'2026-04-03',extEta:'',inc:'INC0041870',nextAction:'Change window on 1 Apr at 2:00 AM IST',history:[{ts:'30 Mar 2026 · 09:00',text:'Certificate obtained. Change window booked 1 Apr. Rollback plan ready.'}]}];
+const DEFAULT_STATUSES=[{label:'In Progress',color:'#1a56db',bg:'#eff4ff'},{label:'Pending RCA',color:'#6c2bd9',bg:'#f5f3ff'},{label:'Pending',color:'#b45309',bg:'#fffbeb'},{label:'Resolved',color:'#057a55',bg:'#e3faf0'}];
+
+function getClusters(){return S.get('clusters')||DEFAULT_CLUSTERS;}
+function getStatuses(){return S.get('statuses')||DEFAULT_STATUSES;}
+function getAdminPass(){return S.get('adminpass')||'admin2024';}
+function getTheme(){return S.get('theme')||'light';}
+function getAccount(){return S.get('account')||{name:'Pilot Account \u2014 Alpha',companyLogo:null,clientLogo:null};}
+function saveAccount(a){S.set('account',a);}
+function getAppSettings(){return S.get('appsettings')||{alias:'Admin',accentColor:'#1a56db',meetingTime:'16:30',timezone:'IST',chartsVisible:true,managementLabel:'Management'};}
+function saveAppSettings(s){S.set('appsettings',s);}
+
+let isAdmin=false;
+
+document.addEventListener('DOMContentLoaded',()=>{
+  applyTheme(getTheme());applyLogos();
+  const now=new Date();
+  const as=getAppSettings();
+  document.getElementById('tbSub').textContent=getAccount().name;
+  document.getElementById('sessionTitle').textContent='Operations Review \u2014 '+now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('sessionSub').textContent=`${as.meetingTime} ${as.timezone} \xb7 ${getAccount().name}`;
+  document.getElementById('callBadge').textContent=`${as.meetingTime} ${as.timezone} Review`;
+  updateSessionPills();
+  render();setInterval(render,30000);
+});
+
+function hexToRgb(h){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return `${r},${g},${b}`;}
+function applyAccent(color){document.documentElement.style.setProperty('--accent',color);document.documentElement.style.setProperty('--accent-bg',`rgba(${hexToRgb(color)},.1)`);}
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);const btn=document.getElementById('themeBtn');if(btn)btn.textContent=t==='dark'?'\u2600\uFE0F':'\uD83C\uDF19';const as=getAppSettings();if(as.accentColor)applyAccent(as.accentColor);}
+function toggleTheme(){const t=getTheme()==='dark'?'light':'dark';S.set('theme',t);applyTheme(t);}
+
+function applyLogos(){
+  const a=getAccount();
+  const cImg=document.getElementById('companyLogoImg'),clImg=document.getElementById('clientLogoImg');
+  const clPl=document.getElementById('companyLogoPlaceholder'),div=document.getElementById('clientLogoDivider');
+  if(a.companyLogo){cImg.src=a.companyLogo;cImg.style.display='block';if(clPl)clPl.style.display='none';}
+  else{if(cImg)cImg.style.display='none';if(clPl)clPl.style.display='flex';}
+  if(a.clientLogo){clImg.src=a.clientLogo;clImg.style.display='block';if(div)div.style.display='block';}
+  else{if(clImg)clImg.style.display='none';if(div)div.style.display='none';}
+}
+
+function updateSessionPills(){
+  const as=getAppSettings();
+  const label=as.managementLabel||'Management';
+  document.getElementById('sessionPills').innerHTML=`<span class="role-pill">${label}</span>`;
+}
+
+function render(){
+  const clusters=getClusters();const statuses=getStatuses();const as=getAppSettings();
+  const acct=getAccount();
+  document.getElementById('tbSub').textContent=acct.name;
+  document.getElementById('sessionSub').textContent=`${as.meetingTime} ${as.timezone} \xb7 ${acct.name}`;
+  document.getElementById('callBadge').textContent=`${as.meetingTime} ${as.timezone} Review`;
+  updateSessionPills();
+  const total=clusters.length;
+  const counts=statuses.map(s=>({...s,cnt:clusters.filter(c=>c.status===s.label).length}));
+  const withUpdates=clusters.filter(c=>c.history&&c.history.length>0).length;
+  document.getElementById('metricsRow').innerHTML=
+    `<div class="mc hi"><div class="mc-lbl">Total clusters</div><div class="mc-val" style="color:var(--accent)">${total}</div><div class="mc-sub">${acct.name}</div></div>`+
+    counts.map(s=>`<div class="mc"><div class="mc-lbl">${s.label}</div><div class="mc-val" style="color:${s.color}">${s.cnt}</div><div class="mc-sub">${Math.round(s.cnt/(total||1)*100)}%</div></div>`).join('');
+
+  // Charts
+  const chartsVisible=as.chartsVisible!==false;
+  const chartsGrid=document.getElementById('chartsGrid');
+  chartsGrid.style.display=chartsVisible?'grid':'none';
+  document.getElementById('chartToggleBtn').textContent=chartsVisible?'Hide charts':'Show charts';
+  if(chartsVisible){
+    const towerMap={};clusters.forEach(c=>{if(c.tower){if(!towerMap[c.tower])towerMap[c.tower]=0;towerMap[c.tower]++;}});
+    const towerEntries=Object.entries(towerMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const maxT=towerEntries[0]?towerEntries[0][1]:1;
+    const today=new Date();today.setHours(0,0,0,0);
+    const overdueCount=clusters.filter(c=>c.eta&&new Date(c.eta)<today&&c.status!=='Resolved').length;
+    const blockerCount=clusters.filter(c=>c.status!=='Resolved'&&(!c.history||c.history.length===0)).length;
+    let offset2=0;const r2=36,circ2=2*Math.PI*r2;
+    const segs2=counts.map(s=>{const pct=s.cnt/total;const dash=pct*circ2;const seg=`<circle cx="45" cy="45" r="${r2}" fill="none" stroke="${s.color}" stroke-width="12" stroke-dasharray="${dash} ${circ2}" stroke-dashoffset="${-offset2*circ2}" transform="rotate(-90 45 45)"/>`;offset2+=pct;return seg;}).join('');
+    chartsGrid.innerHTML=`
+    <div class="chart-card"><div class="chart-lbl">Status breakdown</div><div class="donut-wrap"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="${r2}" fill="none" stroke="var(--surface2)" stroke-width="12"/>${segs2}<text x="45" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">${total}</text></svg><div class="donut-legend">${counts.map(s=>`<div class="dl-item"><div class="dl-dot" style="background:${s.color};"></div>${s.label}: <strong>${s.cnt}</strong></div>`).join('')}</div></div></div>
+    <div class="chart-card"><div class="chart-lbl">Clusters by tower</div><div class="bar-chart">${towerEntries.map(([n,c])=>`<div class="bar-row"><span class="bar-label">${n}</span><div class="bar-track"><div class="bar-fill" style="width:${c/maxT*100}%;background:var(--accent);"></div></div><span class="bar-val">${c}</span></div>`).join('')}</div></div>
+    <div class="chart-card"><div class="chart-lbl">Attention flags</div><div class="bar-chart">
+      <div class="bar-row"><span class="bar-label">No updates</span><div class="bar-track"><div class="bar-fill" style="width:${blockerCount/(total||1)*100}%;background:#c81e1e;"></div></div><span class="bar-val">${blockerCount}</span></div>
+      <div class="bar-row"><span class="bar-label">ETA overdue</span><div class="bar-track"><div class="bar-fill" style="width:${overdueCount/(total||1)*100}%;background:#b45309;"></div></div><span class="bar-val">${overdueCount}</span></div>
+      <div class="bar-row"><span class="bar-label">With updates</span><div class="bar-track"><div class="bar-fill" style="width:${withUpdates/(total||1)*100}%;background:#057a55;"></div></div><span class="bar-val">${withUpdates}</span></div>
+    </div></div>`;
+  }
+
+  document.getElementById('statusBar').innerHTML=counts.map(s=>`<div class="bar-seg" style="width:${s.cnt/(total||1)*100}%;background:${s.color};"></div>`).join('');
+  document.getElementById('statusLegend').innerHTML=counts.map(s=>`<div class="leg-item"><div class="leg-dot" style="background:${s.color};"></div>${s.label} (${s.cnt})</div>`).join('');
+
+  const blockers=clusters.filter(c=>c.status!=='Resolved'&&(!c.history||c.history.length===0));
+  document.getElementById('blockersSec').style.display=blockers.length?'block':'none';
+  document.getElementById('blockersList').innerHTML=blockers.map(c=>`<div class="al-item" style="border-color:#fca5a5;border-left:3px solid var(--danger);" onclick="openDetail('${c.id}')"><span class="al-id" style="color:var(--danger);">${c.id}</span><span class="al-desc">${c.desc}</span><span class="al-tower">${c.tower}</span><span class="al-tag" style="color:var(--danger);">No update</span></div>`).join('');
+
+  const towerMap2={};clusters.forEach(c=>{if(!c.tower)return;if(!towerMap2[c.tower])towerMap2[c.tower]=[];towerMap2[c.tower].push(c);});
+  const towers=Object.keys(towerMap2).sort();
+  document.getElementById('towerSub').textContent=`${towers.length} active towers`;
+  document.getElementById('towerGrid').innerHTML=towers.map(t=>{
+    const tc=towerMap2[t];const mc2={};tc.forEach(c=>{if(!mc2[c.status])mc2[c.status]=0;mc2[c.status]++;});
+    const badges=Object.entries(mc2).map(([s,n])=>{const st=statuses.find(x=>x.label===s)||{color:'#888',bg:'#eee'};return `<span class="mb" style="background:${st.bg};color:${st.color};">${n} ${s}</span>`;}).join('');
+    const items=tc.map(c=>{const st=statuses.find(x=>x.label===c.status)||{color:'#888',bg:'#eee'};return `<div class="cmi" onclick="openDetail('${c.id}')"><span class="cmi-id">${c.id}</span><span class="cmi-desc">${c.desc}</span><span class="cmi-s" style="background:${st.bg};color:${st.color};">${c.status}</span></div>`;}).join('');
+    return `<div class="tc"><div class="tc-hdr"><span class="tc-name">${t}</span><span class="tc-cnt">${tc.length}</span></div><div class="tc-body"><div class="mini-badges">${badges}</div>${items}</div></div>`;
+  }).join('');
+
+  const today2=new Date();today2.setHours(0,0,0,0);
+  const overdue=clusters.filter(c=>c.eta&&new Date(c.eta)<today2&&c.status!=='Resolved');
+  document.getElementById('overdueSec').style.display=overdue.length?'block':'none';
+  document.getElementById('overdueList').innerHTML=overdue.map(c=>`<div class="al-item" style="border-color:#fde68a;border-left:3px solid var(--warn);" onclick="openDetail('${c.id}')"><span class="al-id" style="color:var(--warn);">${c.id}</span><span class="al-desc">${c.desc}</span><span class="al-tower">${c.tower}</span><span class="al-tag" style="color:var(--warn);">ETA: ${c.eta}${c.extEta?' \u2192 '+c.extEta:''}</span></div>`).join('');
+}
+
+function toggleCharts(){const as=getAppSettings();as.chartsVisible=!as.chartsVisible;saveAppSettings(as);render();}
+
+function openDetail(id){
+  const c=getClusters().find(x=>x.id===id);if(!c)return;
+  const statuses=getStatuses();const st=statuses.find(x=>x.label===c.status)||{color:'#888',bg:'#eee'};
+  document.getElementById('dCid').textContent=c.id;
+  document.getElementById('dTitle').textContent=c.desc;
+  document.getElementById('dMeta').textContent=`${c.tower} \xb7 SN: ${(c.sn||[]).join(', ')}`;
+  document.getElementById('dFields').innerHTML=[
+    {l:'Status',v:`<span style="background:${st.bg};color:${st.color};font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;">${c.status}</span>`},
+    {l:'Tower',v:c.tower},{l:'Config item',v:c.ci||'\u2014'},{l:'INC number',v:c.inc||'\u2014'},
+    {l:'ETA',v:c.eta||'\u2014'},{l:'Extended ETA',v:c.extEta||'\u2014'},
+    {l:'Next action',v:c.nextAction||'\u2014'},{l:'Updates logged',v:(c.history||[]).length}
+  ].map(f=>`<div><div class="dmfl">${f.l}</div><div class="dmfv${!f.v||f.v==='\u2014'?' muted':''}">${f.v}</div></div>`).join('');
+  document.getElementById('dHistory').innerHTML=c.history&&c.history.length
+    ?`<div class="hlist">${c.history.slice().reverse().map((h,i)=>`<div class="hentry${i===0?' latest':''}"><div class="hts">${h.ts}</div><div class="htxt">${h.text}</div></div>`).join('')}</div>`
+    :`<div class="hempty">No updates logged for this cluster.</div>`;
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');}
+document.getElementById('detailOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('detailOverlay'))closeDetail();});
+
+function openSettings(){document.getElementById('drawerOverlay').style.display='block';document.getElementById('settingsDrawer').classList.add('open');renderSettingsBody(isAdmin);}
+function closeSettings(){document.getElementById('drawerOverlay').style.display='none';document.getElementById('settingsDrawer').classList.remove('open');}
+
+function renderSettingsBody(unlocked){
+  const as=getAppSettings();const ac=getAccount();
+  if(!unlocked){
+    document.getElementById('settingsBody').innerHTML=`<div class="admin-gate"><div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Admin access required to view settings.</div><div class="drw-row"><input type="password" class="drw-in" id="ldAdminIn" placeholder="Admin password"/><button class="drw-btn" onclick="checkLdAdmin()">Unlock</button></div></div>`;
+    return;
+  }
+  isAdmin=true;
+  document.getElementById('settingsBody').innerHTML=`
+  <div class="drw-sec">
+    <div class="drw-lbl">Appearance</div>
+    <div class="toggle-row"><span style="font-size:12px;color:var(--text);">Dark mode</span><button class="tgl${getTheme()==='dark'?' on':''}" onclick="toggleThemeSettings(this)"></button></div>
+    <div class="color-row" style="margin-top:6px;"><span style="font-size:12px;color:var(--text);flex:1;">Accent colour</span><input type="color" class="color-swatch" id="ldAccentIn" value="${as.accentColor||'#1a56db'}" onchange="applyAccent(this.value)"/><button class="drw-btn" onclick="saveLdAccent()">Apply</button></div>
+  </div>
+  <div class="drw-sec">
+    <div class="drw-lbl">Charts</div>
+    <div class="toggle-row"><span style="font-size:12px;color:var(--text);">Show overview charts</span><button class="tgl${as.chartsVisible!==false?' on':''}" id="ldChartsToggle" onclick="toggleLdChartsSettings(this)"></button></div>
+  </div>
+  <div class="drw-sec">
+    <div class="drw-lbl">Meeting time & timezone</div>
+    <div class="drw-row"><input class="drw-in" id="ldMtIn" value="${as.meetingTime||'16:30'}" placeholder="16:30" style="max-width:75px;"/><input class="drw-in" id="ldTzIn" value="${as.timezone||'IST'}" placeholder="IST" style="max-width:65px;"/><button class="drw-btn" onclick="saveLdMeeting()">Save</button></div>
+    <div style="font-size:10px;color:var(--text3);">Currently: ${as.meetingTime||'16:30'} ${as.timezone||'IST'} (UK daylight saving active)</div>
+  </div>
+  <div class="drw-sec">
+    <div class="drw-lbl">Management label</div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:6px;">Label shown in the session pills (replaces specific role names).</div>
+    <div class="drw-row"><input class="drw-in" id="ldMgmtIn" value="${as.managementLabel||'Management'}" placeholder="Management"/><button class="drw-btn" onclick="saveLdMgmt()">Save</button></div>
+  </div>
+  <div class="drw-sec">
+    <div class="drw-lbl">Account name</div>
+    <div class="drw-row"><input class="drw-in" id="ldAcctIn" value="${ac.name}" placeholder="Account name"/><button class="drw-btn" onclick="saveLdAccount()">Save</button></div>
+  </div>
+  <div class="drw-sec">
+    <div class="drw-lbl">Logos</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div>
+        <div style="font-size:9px;color:var(--text3);margin-bottom:4px;font-weight:700;text-transform:uppercase;">Company</div>
+        <div class="upload-zone" onclick="document.getElementById('ldCompUp').click()">${ac.companyLogo?`<img src="${ac.companyLogo}" class="upload-prev"/>`:'<div style="font-size:10px;color:var(--text3);">Click to upload</div>'}<input type="file" id="ldCompUp" accept="image/*" onchange="uploadLdLogo(this,'company')"/></div>
+        ${ac.companyLogo?`<div style="text-align:center;font-size:10px;color:var(--text3);cursor:pointer;padding:3px;" onclick="removeLdLogo('company')">Remove</div>`:''}
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--text3);margin-bottom:4px;font-weight:700;text-transform:uppercase;">Client</div>
+        <div class="upload-zone" onclick="document.getElementById('ldClUp').click()">${ac.clientLogo?`<img src="${ac.clientLogo}" class="upload-prev"/>`:'<div style="font-size:10px;color:var(--text3);">Click to upload</div>'}<input type="file" id="ldClUp" accept="image/*" onchange="uploadLdLogo(this,'client')"/></div>
+        ${ac.clientLogo?`<div style="text-align:center;font-size:10px;color:var(--text3);cursor:pointer;padding:3px;" onclick="removeLdLogo('client')">Remove</div>`:''}
+      </div>
+    </div>
+  </div>
+  <div class="drw-sec">
+    <div class="drw-lbl">Emergency data</div>
+    <div class="excel-btns"><button class="excel-btn primary" onclick="exportCSV()">&#8595; Export CSV</button><button class="excel-btn" onclick="document.getElementById('ldImportIn').click()">&#8593; Import CSV<input type="file" id="ldImportIn" accept=".csv" style="display:none;" onchange="importCSVLocal(this)"/></button></div>
+  </div>
+  <div class="drw-sec">
+    <div class="drw-lbl">Security</div>
+    <div class="secure-notice">All data is stored in your browser&#39;s local storage. No cluster content, passwords, or logos are visible in the page source to unauthorised users. Host behind SharePoint authentication for access control.</div>
+  </div>`;
+}
+
+function checkLdAdmin(){const p=document.getElementById('ldAdminIn').value;if(p===getAdminPass()){renderSettingsBody(true);showToast('Settings unlocked');}else showToast('Incorrect admin password');}
+function toggleThemeSettings(btn){btn.classList.toggle('on');const t=btn.classList.contains('on')?'dark':'light';S.set('theme',t);applyTheme(t);}
+function saveLdAccent(){const c=document.getElementById('ldAccentIn').value;const as=getAppSettings();as.accentColor=c;saveAppSettings(as);applyAccent(c);showToast('Accent colour saved');}
+function toggleLdChartsSettings(btn){btn.classList.toggle('on');const as=getAppSettings();as.chartsVisible=btn.classList.contains('on');saveAppSettings(as);render();}
+function saveLdMeeting(){const as=getAppSettings();as.meetingTime=document.getElementById('ldMtIn').value.trim();as.timezone=document.getElementById('ldTzIn').value.trim();saveAppSettings(as);render();renderSettingsBody(true);showToast('Meeting time saved');}
+function saveLdMgmt(){const as=getAppSettings();as.managementLabel=document.getElementById('ldMgmtIn').value.trim()||'Management';saveAppSettings(as);updateSessionPills();showToast('Management label saved');}
+function saveLdAccount(){const a=getAccount();a.name=document.getElementById('ldAcctIn').value.trim()||a.name;saveAccount(a);applyLogos();render();showToast('Account name saved');}
+function uploadLdLogo(input,type){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const a=getAccount();if(type==='company')a.companyLogo=e.target.result;else a.clientLogo=e.target.result;saveAccount(a);applyLogos();renderSettingsBody(true);showToast('Logo saved');};reader.readAsDataURL(file);}
+function removeLdLogo(type){const a=getAccount();if(type==='company')a.companyLogo=null;else a.clientLogo=null;saveAccount(a);applyLogos();renderSettingsBody(true);showToast('Logo removed');}
+function exportCSV(){const cls=getClusters();const hdr=['CaseNumber','ClusterID','IssueDescription','Tower','Status','ConfigItem','ETA','ExtendedETA','INCNumber','NextAction','UpdateCount','LastUpdate'];const rows=cls.map(c=>{const last=c.history&&c.history.length?c.history[c.history.length-1].ts+': '+c.history[c.history.length-1].text:'';return[(c.sn||[]).join(';'),c.id,c.desc,c.tower,c.status,c.ci||'',c.eta||'',c.extEta||'',c.inc||'',c.nextAction||'',c.history?c.history.length:0,last].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',');});const csv=[hdr.join(','),...rows].join('\n');const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cluster_tracker_'+new Date().toISOString().slice(0,10)+'.csv';a.click();showToast('CSV exported');}
+// Smart column auto-detection
+const COL_MAP={id:['clusterid','cluster id','cluster_id','id','cl id'],sn:['casenumber','case number','case_number','sn','serial number','case no','serial'],desc:['issuedescription','issue description','description','desc','issue','problem','summary','title'],tower:['tower','assignmentgroup','assignment group','group','team','assigned to','owner group'],status:['status','state','current status'],ci:['configitem','config item','configuration item','ci','asset','device'],eta:['eta','fix date','fixdate','expected date','target date','due date'],extEta:['extendedeta','extended eta','ext eta','new eta','revised eta'],inc:['incnumber','inc number','incident number','inc','ticket','ticketnumber'],nextAction:['nextaction','next action','action required','planned action','next step']};
+function normH(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');}
+function detectCol(header,aliases){const n=normH(header);return aliases.some(a=>normH(a)===n||n.includes(normH(a)));}
+function parseCSVLine(line){const vals=[];let cur='',inQ=false;for(let i=0;i<line.length;i++){if(line[i]==='"'){inQ=!inQ;}else if(line[i]===','&&!inQ){vals.push(cur.trim());cur='';}else{cur+=line[i];}}vals.push(cur.trim());return vals.map(v=>v.replace(/^"|"$/g,'').replace(/""/g,'"'));}
+function smartImportCSV(csvText){
+  const lines=csvText.split('\n').filter(l=>l.trim());
+  if(lines.length<2)throw new Error('File appears empty');
+  const rawHeaders=parseCSVLine(lines[0]);
+  const colIdx={};
+  Object.entries(COL_MAP).forEach(([field,aliases])=>{rawHeaders.forEach((h,i)=>{if(detectCol(h,aliases)&&colIdx[field]===undefined)colIdx[field]=i;});});
+  if(colIdx.desc===undefined&&colIdx.id===undefined)throw new Error('Could not detect required columns. Ensure your file has columns for Issue Description and/or Cluster ID.');
+  const clusters=[];const seenIds={};
+  lines.slice(1).forEach((line,lineIdx)=>{
+    if(!line.trim())return;
+    const vals=parseCSVLine(line);if(vals.length<2)return;
+    const get=f=>{const idx=colIdx[f];return(idx!==undefined&&vals[idx])?vals[idx].trim():'';};
+    const clusterId=get('id');const sn=get('sn');const desc=get('desc');
+    if(!desc&&!clusterId)return;
+    const id=clusterId||('CL-'+String(lineIdx+1).padStart(3,'0'));
+    if(clusterId&&seenIds[clusterId]){const ex=clusters.find(c=>c.id===clusterId);if(ex&&sn)ex.sn.push(sn);return;}
+    if(clusterId)seenIds[clusterId]=true;
+    clusters.push({id,sn:sn?[sn]:[],desc,tower:get('tower'),status:get('status')||'In Progress',ci:get('ci'),eta:get('eta'),extEta:get('extEta'),inc:get('inc'),nextAction:get('nextAction'),history:[]});
+  });
+  if(clusters.length===0)throw new Error('No valid rows found in the file');
+  const detectedLines=rawHeaders.map((h,i)=>{const f=Object.entries(colIdx).find(([,idx])=>idx===i);return f?'"'+h+'" -> '+f[0]+' (mapped)':'"'+h+'" -> ignored';}).join('\n');
+  return {clusters,detectedLines};
+}
+function importCSVLocal(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const result=smartImportCSV(e.target.result);
+      const msg='Import preview: '+result.clusters.length+' clusters detected.\n\nColumn mapping:\n'+result.detectedLines+'\n\nProceed with import?';
+      if(confirm(msg)){
+        saveClusters(result.clusters);
+        if(typeof render==='function')render();
+        if(typeof renderClusters==='function'){renderClusters();renderMetrics();renderSidebar();if(typeof renderCharts==='function')renderCharts();}
+        showToast('Imported '+result.clusters.length+' clusters');
+      }else{showToast('Import cancelled');}
+    }catch(err){alert('Import failed: '+err.message);}
+  };
+  reader.readAsText(file);input.value='';
+}
+function showToast(msg){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+</script>
+</body>
+</html>
